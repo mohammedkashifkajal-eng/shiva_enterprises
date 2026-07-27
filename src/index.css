@@ -1,0 +1,359 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  color-scheme: light;
+  width: 100%;
+  min-height: 100vh;
+  --header-h: 64px;
+
+  /* ── Palette — inspired by hero images ──────────────────────────────────
+     Bus image:  light steel-blue sky (#cdd9e5), orange GPS pin (#f5a623)
+     Girl image: warm cream (#fdf6f0), soft blue blobs (#b8d4e8), orange top (#ea580c)
+     ────────────────────────────────────────────────────────────────────── */
+
+  --bg-base:       #fdfaf7;   /* warm cream — matches girl image background */
+  --bg-section:    #eef3f8;   /* soft steel-blue tint — matches bus sky */
+  --bg-card:       #ffffff;   /* pure white cards */
+  --bg-muted:      #f1f5f9;   /* light grey (kept for compatibility) */
+  --bg-subtle:     #e8edf3;   /* slightly deeper blue-grey */
+  --bg-dark:       #0f172a;   /* deep slate — for dark service hero sections */
+
+  --border-subtle: #d4dde8;   /* blue-tinted border */
+  --border-card:   #e8edf3;
+
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --text-muted:    #64748b;
+
+  --accent:        #ea580c;   /* orange — consistent with hero images */
+  --accent-light:  #fb923c;
+  --accent-teal:   #4a9e9b;   /* teal blob from girl image */
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 80px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h, 80px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 999px;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  margin: 0;
+  width: 100%;
+  max-width: 100vw;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Mobile-first: ensure touch targets are at least 44x44px */
+@media (max-width: 767px) {
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Ensure all interactive elements have proper spacing */
+  .flex > button,
+  .flex > a,
+  [role="menuitem"] {
+    min-height: 44px;
+  }
+}
+
+/* Fix iOS Safari input zoom */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Responsive images */
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ensure iframes and embeds are responsive */
+iframe,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Selection */
+::selection {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+p {
+  line-height: 1.7;
+  letter-spacing: -0.005em;
+}
+
+/* Very small screen adjustments */
+@media (max-width: 374px) {
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  .text-3xl {
+    font-size: 1.5rem;
+  }
+  .px-4 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .py-16 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 375px) and (max-width: 767px) {
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Fix for iPhone notch / dynamic island */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent text size adjustment on orientation change on iOS */
+@media screen and (max-device-width: 480px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+}
+
+/* Smooth scrolling for anchor links */
+@media (hover: hover) {
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+/* ======= Mobile Touch & Responsive Improvements ======= */
+
+/* Ensure absolutely/fixed positioned elements don't cause horizontal scroll */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent horizontal overflow on all containers */
+.container,
+section,
+div {
+  max-width: 100vw;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Better tap targets for any interactive element not already covered */
+[role="button"],
+summary,
+label,
+select {
+  cursor: pointer;
+}
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile: reduce excessive letter-spacing and tracking that causes overflow */
+@media (max-width: 374px) {
+  [class*="tracking-wider"],
+  [class*="tracking-widest"] {
+    letter-spacing: 0.02em !important;
+  }
+  [class*="tracking-["] {
+    letter-spacing: 0.02em !important;
+  }
+}
+
+/* Very small screens: reduce padding/margins */
+@media (max-width: 359px) {
+  .px-4 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .px-5 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .px-7 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .px-8 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .gap-4 {
+    gap: 0.75rem !important;
+  }
+  .gap-5 {
+    gap: 0.75rem !important;
+  }
+  .gap-6 {
+    gap: 0.75rem !important;
+  }
+}
+
+
+
+/* ======= Hero-inspired consistent backgrounds ======= */
+
+/* Homepage hero — use dvh so the section never exceeds the visible viewport on mobile */
+.hero-section {
+  height: 100dvh;
+  height: 100vh;
+  min-height: 560px;
+}
+
+/* Alternating section backgrounds */
+.section-white   { background-color: #ffffff; }
+.section-cream   { background-color: var(--bg-base); }      /* #fdfaf7 warm cream */
+.section-blue    { background-color: var(--bg-section); }   /* #eef3f8 steel-blue tint */
+.section-muted   { background-color: var(--bg-muted); }
+
+/* Page hero strip — dot-grid pattern with cream-to-white gradient */
+.hero-strip {
+  background-color: var(--bg-base);
+}
+.hero-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border-subtle) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Card consistent style */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}

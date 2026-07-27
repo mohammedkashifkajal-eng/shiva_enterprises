@@ -1,0 +1,561 @@
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, useInView } from "motion/react";
+import {
+  Bus, Globe, Shield, CreditCard, Play,
+  MapPin, Layers, ArrowRight, ArrowUp,
+  ChevronLeft, ChevronRight
+} from "lucide-react";
+
+import ThreeDCard from "./components/ThreeDCard";
+import ServicesGrid from "./components/ServicesGrid";
+import BusSimulator from "./components/BusSimulator";
+import IDCardPrinter from "./components/IDCardPrinter";
+import InsuranceCalculator from "./components/InsuranceCalculator";
+import SiteHeader from "./components/SiteHeader";
+
+const heroIdCard = "https://cdn.phototourl.com/free/2026-07-10-7d5846b8-3932-4bff-ba6f-7125b4cb05e8.jpg";
+
+// Rotating hero slides
+type HeroAction = { type: "scroll"; id: string } | { type: "route"; to: string };
+
+interface HeroSlide {
+  image: string;
+  layout: "cover" | "split";
+  title: string;
+  description: string;
+  primaryCta: { label: string; action: HeroAction };
+  secondaryCta: { label: string; action: HeroAction };
+  highlights: string[];
+}
+
+const heroSlides: HeroSlide[] = [
+  {
+    image: "https://cdn.phototourl.com/free/2026-07-09-727a42b3-d7d3-48f7-b469-d3531a36c5c9.jpg",
+    layout: "cover",
+    title: "Trusted Technology for Safety and Security Of Childrens.",
+    description:
+      "From identity cards to analytics, bring every part of your institution onto one reliable, future-ready platform.",
+    primaryCta: { label: "Explore Live Demo", action: { type: "scroll", id: "demo" } },
+    secondaryCta: { label: "View Smart Solutions", action: { type: "scroll", id: "services" } },
+    highlights: [
+      "Smart ID Cards",
+      "Fee Tracking",
+      "Parent Portal",
+      "Campus Analytics",
+    ],
+  },
+  {
+    image: "https://cdn.phototourl.com/free/2026-07-10-44bdc36e-bbf6-4812-8703-2e897012614f.jpg",
+    layout: "cover",
+    title: "Modern School Website for Better Learning.",
+    description:
+      "Showcasing your institution's values while engaging students, parents, and prospective families.",
+    primaryCta: { label: "Explore Live Demo", action: { type: "scroll", id: "demo" } },
+    secondaryCta: { label: "View Smart Solutions", action: { type: "scroll", id: "services" } },
+    highlights: [
+      "Smart Attendance",
+      "Online Fee Management",
+      "Student & Parent Portal",
+      "Real-Time Analytics",
+    ],
+  },
+  {
+    image: "https://cdn.phototourl.com/free/2026-07-10-95603b16-7e9d-4032-b500-ad787574d57a.jpg",
+    layout: "cover",
+    title: "Advanced Security for Today's Digital World",
+    description:
+      "Create a safer, smarter environment with integrated security and identity solutions designed for organizations of every size. Simplify operations, strengthen access control, and gain real-time visibility with technology built for modern security challenges.",
+    primaryCta: { label: "Explore Live Demo", action: { type: "scroll", id: "demo" } },
+    secondaryCta: { label: "View Smart Solutions", action: { type: "scroll", id: "services" } },
+    highlights: [
+      "Digital Operations",
+      "Access Control",
+      "Campus Insights",
+      "Secure Identity",
+      "Smart Analytics",
+    ],
+  },
+  {
+    image: heroIdCard,
+    layout: "cover",
+    title: "Smart Campus Solutions for Modern Educational Institutions.",
+    description:
+      "Digitize student identity, attendance, fee management, access control, and campus operations with one powerful platform built for schools, colleges, and universities.",
+    primaryCta: { label: "Explore Live Demo", action: { type: "scroll", id: "demo" } },
+    secondaryCta: { label: "View Smart Solutions", action: { type: "scroll", id: "services" } },
+    highlights: [
+      "Smart ID Card Management",
+      "Attendance & Fee Tracking",
+      "Student & Parent Portal",
+      "Real-Time Campus Analytics",
+    ],
+  },
+];
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function HeroContentBlock({
+  slide,
+  align,
+  onAction,
+}: {
+  slide: HeroSlide;
+  align: "left" | "center";
+  onAction: (action: HeroAction) => void;
+}) {
+  const isLeft = align === "left";
+  const entX = isLeft ? -48 : 0;
+  const titleSize = isLeft
+    ? "text-3xl sm:text-4xl md:text-5xl xl:text-6xl"
+    : "text-3xl sm:text-4xl md:text-5xl xl:text-5xl";
+  const descSize = isLeft ? "text-sm sm:text-[15px]" : "text-sm sm:text-base";
+
+  return (
+    <>
+      <motion.h2
+        initial={{ opacity: 0, y: 20, x: entX * 1.3 }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
+        className={`mt-6 font-black leading-tight tracking-tight text-white drop-shadow-md sm:mt-7 ${titleSize} ${isLeft ? "text-center sm:text-left" : "text-center"}`}
+      >
+        {slide.title}
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0, y: 16, x: entX }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
+        className={`mx-auto mt-5 max-w-2xl leading-7 text-white/90 ${descSize} ${isLeft ? "text-center sm:text-left" : "text-center"}`}
+      >
+        {slide.description}
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16, x: entX }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.4 }}
+        className={`mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center ${isLeft ? "justify-center sm:justify-start" : "sm:justify-center"}`}
+      >
+        <button
+          onClick={() => onAction(slide.primaryCta.action)}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 px-7 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-amber-900/20 transition-all hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-900/30 hover:-translate-y-0.5 sm:w-auto"
+        >
+          <Play className="h-4 w-4 fill-white" />
+          {slide.primaryCta.label}
+        </button>
+        <button
+          onClick={() => onAction(slide.secondaryCta.action)}
+          className="inline-flex w-full items-center justify-center rounded-2xl border border-white/50 bg-white/15 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25 hover:-translate-y-0.5 sm:w-auto"
+        >
+          {slide.secondaryCta.label}
+        </button>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 12, x: entX }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        className={`mt-8 flex flex-wrap items-center gap-2 ${isLeft ? "justify-center sm:justify-start" : "justify-center"}`}
+      >
+        {slide.highlights.map((highlight, idx) => (
+          <motion.span
+            key={highlight}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.6 + idx * 0.08 }}
+            className="rounded-full border border-white/40 bg-white/15 px-4 py-2 text-xs text-white backdrop-blur-sm sm:text-sm"
+          >
+            {highlight}
+          </motion.span>
+        ))}
+      </motion.div>
+    </>
+  );
+}
+
+function CoverLayout({
+  slide,
+  isActive,
+  isPriority,
+}: {
+  slide: HeroSlide;
+  isActive: boolean;
+  isPriority: boolean;
+}) {
+  return (
+    <div
+      aria-hidden={!isActive}
+      className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 transition-opacity duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+        isActive ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <img
+        src={slide.image}
+        alt=""
+        decoding="async"
+        loading={isPriority ? "eager" : "lazy"}
+        fetchPriority={isPriority ? "high" : "low"}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+        }}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/45 to-slate-900/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/65 via-slate-900/20 to-transparent" />
+    </div>
+  );
+}
+
+export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeDemo, setActiveDemo] = useState<"bus" | "printer">("bus");
+  const [activeImage, setActiveImage] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const goToPrevImage = () => {
+    setActiveImage((current) =>
+      current === 0 ? heroSlides.length - 1 : current - 1
+    );
+  };
+
+  const goToNextImage = () => {
+    setActiveImage((current) => (current + 1) % heroSlides.length);
+  };
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveImage((current) => (current + 1) % heroSlides.length);
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) {
+      window.setTimeout(() => target.scrollIntoView(), 80);
+    }
+  }, [location.hash]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 600);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView();
+    }
+  };
+
+  const handleHeroAction = (action: HeroAction) => {
+    if (action.type === "route") {
+      navigate(action.to);
+    } else {
+      scrollToSection(action.id);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-amber-300 selection:text-slate-900 overflow-x-hidden pt-[var(--header-h,80px)]">
+
+
+      <SiteHeader />
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden min-h-[calc(100svh-var(--header-h,80px))]">
+        <div className="absolute inset-0">
+          {heroSlides.map((slide, idx) => (
+            <CoverLayout
+              key={slide.image}
+              slide={slide}
+              isActive={idx === activeImage}
+              isPriority={idx === 0}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 mx-auto flex min-h-[calc(100svh-var(--header-h,80px))] w-full max-w-7xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+          <div className="mx-auto max-w-3xl text-center sm:text-left sm:mx-0 lg:max-w-2xl">
+            <HeroContentBlock slide={heroSlides[activeImage]} align="left" onAction={handleHeroAction} />
+          </div>
+        </div>
+
+        <button
+          onClick={goToPrevImage}
+          aria-label="Previous image"
+          className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/30 hover:shadow-lg sm:flex sm:left-5"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+        <button
+          onClick={goToNextImage}
+          aria-label="Next image"
+          className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/30 hover:shadow-lg sm:flex sm:right-5"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </button>
+
+        <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveImage(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`h-2 rounded-full transition-all ${
+                idx === activeImage ? "w-6 bg-amber-500" : "w-2 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <FadeIn>
+        <section id="about" className="px-4 py-16 bg-white border-t border-slate-200 md:px-8 md:py-20">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 gap-8 items-center lg:grid-cols-2 lg:gap-12">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-amber-700 text-[10px] font-medium tracking-[0.12em] uppercase">
+                About Shiva Enterprises
+              </div>
+              <h3 className="mt-5 text-2xl md:text-3xl font-bold leading-snug tracking-tight text-slate-900">
+                Practical digital systems for schools, transport operators, and growing teams.
+              </h3>
+              <p className="mt-4 max-w-xl text-sm text-slate-600 leading-7">
+                We combine reliable software, transport technology, and smart operations support to help institutions stay safer, more connected, and easier to manage.
+              </p>
+              <Link to="/about" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-700 transition hover:text-amber-600 group">
+                Learn more about our approach
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 sm:p-8">
+              <p className="text-sm text-slate-600 leading-7">
+                From custom websites and school platforms to GPS tracking and digital ID card solutions, our work is designed to be simple to use and practical to deploy.
+              </p>
+            </div>
+          </div>
+        </section>
+      </FadeIn>
+
+      {/* Services Section */}
+      <FadeIn>
+        <section id="services" className="px-4 py-16 bg-slate-50/50 border-t border-slate-200 md:px-8 md:py-20">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-amber-700 text-[10px] font-mono tracking-wider uppercase">
+                Practical Solutions That Work
+              </div>
+              <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+                Built For Safety, Clarity, and Growth
+              </h3>
+              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                Every service is designed to make operations easier for schools, parents, and administrators while keeping the experience modern and user-friendly.
+              </p>
+            </div>
+            <ServicesGrid />
+          </div>
+        </section>
+      </FadeIn>
+
+      {/* Demo Section */}
+      <FadeIn>
+        <section id="demo" className="px-4 py-16 bg-gradient-to-br from-slate-50 via-white to-amber-50/30 border-t border-slate-200 relative md:px-8 md:py-20">
+          <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:32px_32px] opacity-10" />
+          <div className="max-w-7xl mx-auto relative z-10">
+
+            <div className="text-center max-w-2xl mx-auto space-y-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Live Demo</span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+                Interactive <span className="text-amber-600">System Preview</span>
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
+                Experience our school management solutions in real-time. Explore GPS tracking with live camera feeds and our automated PVC ID card printing system.
+              </p>
+
+              <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
+                <button
+                  onClick={() => setActiveDemo("bus")}
+                  className={`px-5 py-2 rounded-md text-xs font-semibold transition-all ${
+                    activeDemo === "bus"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  GPS Tracker & CCTV
+                </button>
+                <button
+                  onClick={() => setActiveDemo("printer")}
+                  className={`px-5 py-2 rounded-md text-xs font-semibold transition-all ${
+                    activeDemo === "printer"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  PVC ID Card Maker
+                </button>
+              </div>
+            </div>
+
+            <div className="w-full mt-10">
+              <AnimatePresence mode="wait">
+                {activeDemo === "bus" ? (
+                  <motion.div
+                    key="bus"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                  >
+                    <BusSimulator />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="printer"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                  >
+                    <IDCardPrinter />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+          </div>
+        </section>
+      </FadeIn>
+
+      {/* Calculator Section */}
+      <FadeIn>
+        <section id="calculator" className="px-4 py-16 bg-white border-t border-slate-200 md:px-8 md:py-20">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-amber-700 text-[10px] font-mono tracking-wider uppercase">
+                Smart Insurance Model
+              </div>
+              <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+                Calculate Your <span className="text-amber-600">School's Savings</span>
+              </h3>
+              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                See how much your school saves when digital solutions are reinvested through our insurance partnership model.
+              </p>
+            </div>
+            <InsuranceCalculator />
+          </div>
+        </section>
+      </FadeIn>
+
+      {/* CTA Section */}
+      <FadeIn>
+        <section className="px-4 py-16 md:py-20 bg-white border-t border-slate-200">
+          <div className="max-w-7xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-amber-700">
+              Get In Touch
+            </div>
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 px-4">
+              Ready to get started?
+            </h3>
+            <p className="mx-auto max-w-2xl text-sm leading-6 text-slate-600 px-4">
+              Reach out to our team in Kalaburagi for a custom proposal, or visit our contact page for direct details.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
+              <Link
+                to="/contact"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-white border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-400 hover:text-amber-700"
+              >
+                <MapPin className="w-4 h-4 text-amber-600" />
+                View Contact Details
+              </Link>
+              <Link
+                to="/request-proposal"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-lg transition hover:bg-slate-800 hover:shadow-xl"
+              >
+                Request a Custom Proposal
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      </FadeIn>
+
+      {/* Footer */}
+      <FadeIn>
+        <footer className="bg-slate-50 border-t border-slate-200 py-12 px-4 md:px-8">
+          <div className="max-w-7xl mx-auto flex flex-col items-center justify-between gap-6">
+
+            <div className="flex items-center justify-center gap-2.5 text-center">
+              <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-white text-sm">
+                S
+              </div>
+              <div>
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">SHIVA ENTERPRISES</span>
+                <span className="text-[9px] text-slate-500 font-mono">Smart Technology & Digital Growth Solutions</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-mono text-slate-500">
+              <Link to="/about" className="transition hover:text-amber-700">About</Link>
+              <Link to="/contact" className="transition hover:text-amber-700">Contact</Link>
+              <Link to="/request-proposal" className="transition hover:text-amber-700">Request Proposal</Link>
+              <a href="http://shivaenterprises.net.in" target="_blank" rel="noopener noreferrer" className="transition hover:text-amber-700">Portal</a>
+              <span>© 2026 SHIVA ENTERPRISES. All Rights Reserved.</span>
+            </div>
+
+          </div>
+        </footer>
+      </FadeIn>
+
+      {/* Back to top button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            key="back-to-top"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ duration: 0.25 }}
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            className="fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition hover:bg-slate-800 hover:shadow-xl"
+          >
+            <ArrowUp className="h-4 w-4" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}

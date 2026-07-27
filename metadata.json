@@ -1,0 +1,6 @@
+{
+  "name": "Shiva Enterprises",
+  "description": "3D Interactive Animation Portfolio for Shiva Enterprises, featuring smart school web solutions, GPS bus tracking simulators, CCTV monitoring, and ID card printer models.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
