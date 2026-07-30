@@ -220,7 +220,7 @@ export default function App() {
 
   return (
     // overflow-x-hidden only — never overflow-hidden on the root so the page scrolls freely
-    <div className="min-h-screen text-slate-900 font-sans selection:bg-slate-300 selection:text-slate-900 overflow-x-hidden" style={{ background: 'var(--bg-base)', maxWidth: "none" }}>
+    <div className="min-h-screen text-slate-900 font-sans selection:bg-slate-300 selection:text-slate-900" style={{ background: 'var(--bg-base)', maxWidth: "none", overflowX: "clip" }}>
 
       <SiteHeader />
 
